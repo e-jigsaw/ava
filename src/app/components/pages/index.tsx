@@ -28,14 +28,21 @@ export const Top: React.FC = () => {
     if (!user) {
       return
     }
-    firebase
-      .firestore()
-      .collection('rooms')
+    const db = firebase.firestore()
+    db.collection('rooms')
       .add({
         host: user.uid
       })
       .then(doc => {
-        router.push(`/rooms/${doc.id}`)
+        const userRef = db.collection('users').doc(user.uid)
+        doc
+          .collection('participants')
+          .add({
+            user: userRef
+          })
+          .then(() => {
+            router.push(`/rooms/${doc.id}`)
+          })
       })
   }, [firebase, user])
   useEffect(() => {
