@@ -4,15 +4,10 @@ import { Button } from 'antd'
 import { useEffect, useContext, useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/router'
 import { GlobalContext } from 'components/App'
-import { Maybe } from '../../../../next-env'
+import { Maybe, User } from 'resources'
 
 type Props = {
   id: string
-}
-
-export type User = {
-  uid: string
-  name: string
 }
 
 export const Room: React.FC<Props> = ({ id }) => {
@@ -56,7 +51,8 @@ export const Room: React.FC<Props> = ({ id }) => {
       .doc(id)
       .collection('participants')
       .add({
-        user: userRef
+        user: userRef,
+        order: Math.random()
       })
   }, [user])
   const isJoined = useMemo(
@@ -69,15 +65,18 @@ export const Room: React.FC<Props> = ({ id }) => {
       }),
     [user, participants]
   )
-  const createRound = useCallback(() => {
+  const createRound = useCallback(async () => {
     const db = firebase.firestore()
-    db.collection('rooms')
-      .doc(id)
-      .collection('rounds')
-      .add({
-        cratedAt: new Date().getTime()
-      })
-      .then(doc => router.push(`/rooms/${id}/rounds/${doc.id}`))
+    const roomRef = db.collection('rooms').doc(id)
+    const parentQuery = await roomRef
+      .collection('participants')
+      .orderBy('order')
+      .limit(1)
+      .get()
+    const doc = await roomRef.collection('rounds').add({
+      parent: parentQuery.docs[0].data()
+    })
+    router.push(`/rooms/${id}/rounds/${doc.id}`)
   }, [])
   return (
     <div>

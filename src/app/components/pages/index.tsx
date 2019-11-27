@@ -38,7 +38,8 @@ export const Top: React.FC = () => {
         doc
           .collection('participants')
           .add({
-            user: userRef
+            user: userRef,
+            order: Math.random()
           })
           .then(() => {
             router.push(`/rooms/${doc.id}`)
