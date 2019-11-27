@@ -2,7 +2,7 @@ import firebase from 'firebase/app'
 import { Button, Input, Row, Col } from 'antd'
 import { useCallback, useState, useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { GlobalContext } from '../App'
+import { GlobalContext } from 'components/App'
 
 export const Top: React.FC = () => {
   const router = useRouter()

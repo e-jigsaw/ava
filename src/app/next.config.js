@@ -1,4 +1,7 @@
 const withCss = require('@zeit/next-css')
+const { resolve } = require('path')
+
+const createAlias = name => resolve(__dirname, name)
 
 module.exports = withCss({
   webpack: (config, { isServer }) => {
@@ -21,6 +24,10 @@ module.exports = withCss({
         test: antStyles,
         use: 'null-loader'
       })
+    }
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      components: createAlias('components')
     }
     return config
   },

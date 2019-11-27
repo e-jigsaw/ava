@@ -2,19 +2,21 @@ import 'firebase/firestore'
 import firebase from 'firebase/app'
 import { Button } from 'antd'
 import { useEffect, useContext, useState, useMemo, useCallback } from 'react'
-import { GlobalContext } from '../../App'
-import { Maybe } from '../../../next-env'
+import { useRouter } from 'next/router'
+import { GlobalContext } from 'components/App'
+import { Maybe } from '../../../../next-env'
 
 type Props = {
   id: string
 }
 
-type User = {
+export type User = {
   uid: string
   name: string
 }
 
 export const Room: React.FC<Props> = ({ id }) => {
+  const router = useRouter()
   const { user } = useContext(GlobalContext)
   const [room, setRoom] = useState<Maybe<firebase.firestore.DocumentData>>(null)
   const [participants, setParticipants] = useState<User[]>([])
@@ -67,7 +69,16 @@ export const Room: React.FC<Props> = ({ id }) => {
       }),
     [user, participants]
   )
-  console.log(isJoined)
+  const createRound = useCallback(() => {
+    const db = firebase.firestore()
+    db.collection('rooms')
+      .doc(id)
+      .collection('rounds')
+      .add({
+        cratedAt: new Date().getTime()
+      })
+      .then(doc => router.push(`/rooms/${id}/rounds/${doc.id}`))
+  }, [])
   return (
     <div>
       <div>{isHost ? 'あなたはホストです' : 'あなたは参加者です'}</div>
@@ -85,6 +96,13 @@ export const Room: React.FC<Props> = ({ id }) => {
           <span key={u.uid}>{u.name},&nbsp;</span>
         ))}
       </div>
+      {isHost && (
+        <div>
+          <Button type="primary" onClick={createRound}>
+            ラウンドをスタート
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

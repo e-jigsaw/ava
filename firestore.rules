@@ -14,5 +14,15 @@ service cloud.firestore {
       allow read;
       allow write: if request.auth.uid != null;
     }
+
+    match /rooms/{roomID}/rounds/{roundID} {
+      allow read;
+      allow write: if request.auth.uid != null;
+    }
+
+    match /rooms/{roomID}/rounds/{roundID}/elections/{electionID} {
+      allow read;
+      allow write: if request.auth.uid != null;
+    }
   }
 }

@@ -1,8 +1,8 @@
 import { NextPage } from 'next'
 import dynamic from 'next/dynamic'
-import { Room } from '../../components/pages/rooms/[id]'
+import { Room } from 'components/pages/rooms/[id]'
 
-const App = dynamic(() => import('../../components/App'), { ssr: false })
+const App = dynamic(() => import('components/App'), { ssr: false })
 
 type Props = {
   id: string
