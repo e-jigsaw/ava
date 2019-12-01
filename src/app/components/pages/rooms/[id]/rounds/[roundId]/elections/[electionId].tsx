@@ -1,14 +1,13 @@
 import 'firebase/firestore'
 import firebase from 'firebase/app'
 import { Button } from 'antd'
-import { useRouter } from 'next/router'
 import { useEffect, useState, useCallback, useContext, useMemo } from 'react'
 import { Props } from 'pages/rooms/[id]/rounds/[roundId]/elections/[electionId]'
 import { User, Maybe, Vote } from 'resources'
 import { GlobalContext } from 'components/App'
+import { LocationWatcher } from 'components/LocationWatcher'
 
 export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
-  const router = useRouter()
   const { user } = useContext(GlobalContext)
   const [owner, setOwner] = useState<Maybe<User>>(null)
   const [party, setParty] = useState<User[]>([])
@@ -124,20 +123,27 @@ export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
     return agrees > participantCount / 2
   }, [isFullfill, votes])
   const gotoNextElection = useCallback(() => {
-    router.push(`/rooms/${id}/rounds/${roundId}`)
-  }, [router, id, roundId])
+    firebase
+      .firestore()
+      .collection('rooms')
+      .doc(id)
+      .update({
+        location: `/rooms/${id}/rounds/${roundId}`
+      })
+  }, [id, roundId])
   const gotoQuest = useCallback(async () => {
     const db = firebase.firestore()
     const partyRef = party.map(user => db.collection('users').doc(user.uid))
-    await db
-      .collection('rooms')
-      .doc(id)
+    const room = db.collection('rooms').doc(id)
+    await room
       .collection('rounds')
       .doc(roundId)
       .update({
         party: partyRef
       })
-    router.push(`/rooms/${id}/rounds/${roundId}/quest`)
+    room.update({
+      location: `/rooms/${id}/rounds/${roundId}/quest`
+    })
   }, [party])
   return (
     <div>
@@ -181,6 +187,7 @@ export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
           </>
         )}
       </div>
+      <LocationWatcher id={id} />
     </div>
   )
 }

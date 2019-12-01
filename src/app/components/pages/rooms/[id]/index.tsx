@@ -2,16 +2,15 @@ import 'firebase/firestore'
 import firebase from 'firebase/app'
 import { Button } from 'antd'
 import { useEffect, useContext, useState, useMemo, useCallback } from 'react'
-import { useRouter } from 'next/router'
 import { GlobalContext } from 'components/App'
 import { Maybe, User } from 'resources'
+import { LocationWatcher } from 'components/LocationWatcher'
 
 type Props = {
   id: string
 }
 
 export const Room: React.FC<Props> = ({ id }) => {
-  const router = useRouter()
   const { user } = useContext(GlobalContext)
   const [room, setRoom] = useState<Maybe<firebase.firestore.DocumentData>>(null)
   const [participants, setParticipants] = useState<User[]>([])
@@ -76,7 +75,9 @@ export const Room: React.FC<Props> = ({ id }) => {
     const doc = await roomRef.collection('rounds').add({
       parent: parentQuery.docs[0].data()
     })
-    router.push(`/rooms/${id}/rounds/${doc.id}`)
+    roomRef.update({
+      location: `/rooms/${id}/rounds/${doc.id}`
+    })
   }, [])
   return (
     <div>
@@ -102,6 +103,7 @@ export const Room: React.FC<Props> = ({ id }) => {
           </Button>
         </div>
       )}
+      <LocationWatcher id={id} />
     </div>
   )
 }

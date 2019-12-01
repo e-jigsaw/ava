@@ -2,9 +2,9 @@ import 'firebase/firestore'
 import firebase from 'firebase/app'
 import { Button } from 'antd'
 import { useEffect, useState, useContext, useMemo, useCallback } from 'react'
-import { useRouter } from 'next/router'
 import { User, Mission } from 'resources'
 import { GlobalContext } from 'components/App'
+import { LocationWatcher } from 'components/LocationWatcher'
 
 type Props = {
   id: string
@@ -12,7 +12,6 @@ type Props = {
 }
 
 export const Quest: React.FC<Props> = ({ id, roundId }) => {
-  const router = useRouter()
   const { user } = useContext(GlobalContext)
   const [party, setParty] = useState<User[]>([])
   const [mission, setMission] = useState<Mission[]>([])
@@ -60,10 +59,13 @@ export const Quest: React.FC<Props> = ({ id, roundId }) => {
     }
     return mission.some(m => m.uid === user.uid)
   }, [user, mission])
-  const isSuccess = useMemo(
+  const missionResult = useMemo(
     () =>
       party.length > 0 && party.length === mission.length
-        ? mission.every(m => m.choice)
+        ? {
+            success: mission.filter(m => m.choice).length,
+            failure: mission.filter(m => !m.choice).length
+          }
         : null,
     [party, mission]
   )
@@ -117,7 +119,9 @@ export const Quest: React.FC<Props> = ({ id, roundId }) => {
     const next = await room.collection('rounds').add({
       parent: data.parent
     })
-    router.push(`/rooms/${id}/rounds/${next.id}`)
+    room.update({
+      location: `/rooms/${id}/rounds/${next.id}`
+    })
   }, [])
   return (
     <div>
@@ -135,12 +139,18 @@ export const Quest: React.FC<Props> = ({ id, roundId }) => {
           </Button>
         </div>
       )}
-      {isSuccess !== null && (isSuccess ? <div>成功</div> : <div>失敗</div>)}
-      {isSuccess !== null && isHost && (
+      {missionResult !== null && (
+        <div>
+          <div>成功:&nbsp;{missionResult.success}</div>
+          <div>失敗:&nbsp;{missionResult.failure}</div>
+        </div>
+      )}
+      {missionResult !== null && isHost && (
         <Button type="primary" onClick={gotoNextRound}>
           次のラウンドへ
         </Button>
       )}
+      <LocationWatcher id={id} />
     </div>
   )
 }

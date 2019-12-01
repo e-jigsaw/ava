@@ -1,10 +1,10 @@
 import 'firebase/firestore'
 import firebase from 'firebase/app'
 import { Switch, Button } from 'antd'
-import { useRouter } from 'next/router'
 import { useEffect, useState, useCallback, useContext } from 'react'
 import { Maybe, User, Participant } from 'resources'
 import { GlobalContext } from 'components/App'
+import { LocationWatcher } from 'components/LocationWatcher'
 
 type Props = {
   id: string
@@ -12,7 +12,6 @@ type Props = {
 }
 
 export const Round: React.FC<Props> = ({ id, roundId }) => {
-  const router = useRouter()
   const { user } = useContext(GlobalContext)
   const [participants, setParticipants] = useState<User[]>([])
   const [parent, setParent] = useState<Maybe<Participant>>(null)
@@ -55,7 +54,9 @@ export const Round: React.FC<Props> = ({ id, roundId }) => {
       party: userRefs,
       owner: db.collection('users').doc(user.uid)
     })
-    router.push(`/rooms/${id}/rounds/${roundId}/elections/${doc.id}`)
+    roomRef.update({
+      location: `/rooms/${id}/rounds/${roundId}/elections/${doc.id}`
+    })
   }, [candidates, user, parent])
   useEffect(() => {
     const db = firebase.firestore()
@@ -111,6 +112,7 @@ export const Round: React.FC<Props> = ({ id, roundId }) => {
           </>
         ) : null
       ) : null}
+      <LocationWatcher id={id} />
     </div>
   )
 }
