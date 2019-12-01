@@ -14,3 +14,8 @@ export type Participant = {
   order: number
   user: User
 }
+
+export type Mission = {
+  choice: boolean
+  uid: string
+}

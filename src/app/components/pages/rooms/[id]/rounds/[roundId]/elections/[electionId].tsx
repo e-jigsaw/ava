@@ -126,6 +126,19 @@ export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
   const gotoNextElection = useCallback(() => {
     router.push(`/rooms/${id}/rounds/${roundId}`)
   }, [router, id, roundId])
+  const gotoQuest = useCallback(async () => {
+    const db = firebase.firestore()
+    const partyRef = party.map(user => db.collection('users').doc(user.uid))
+    await db
+      .collection('rooms')
+      .doc(id)
+      .collection('rounds')
+      .doc(roundId)
+      .update({
+        party: partyRef
+      })
+    router.push(`/rooms/${id}/rounds/${roundId}/quest`)
+  }, [party])
   return (
     <div>
       <div>起案者:&nbsp;{owner ? owner.name : ''}</div>
@@ -155,7 +168,11 @@ export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
                 {vote.voter.name}:&nbsp;{vote.voting ? '賛成' : '反対'}
               </div>
             ))}
-            {isHost && isWin && <div>win</div>}
+            {isHost && isWin && (
+              <Button type="primary" onClick={gotoQuest}>
+                クエストへ
+              </Button>
+            )}
             {isHost && !isWin && (
               <Button type="primary" onClick={gotoNextElection}>
                 次の投票へ
