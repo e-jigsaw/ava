@@ -25,27 +25,20 @@ export const Top: React.FC = () => {
         name
       })
   }, [firebase, user, name])
-  const createRoom = useCallback(() => {
+  const createRoom = useCallback(async () => {
     if (!user) {
       return
     }
     const db = firebase.firestore()
-    db.collection('rooms')
-      .add({
-        host: user.uid
-      })
-      .then(doc => {
-        const userRef = db.collection('users').doc(user.uid)
-        doc
-          .collection('participants')
-          .add({
-            user: userRef,
-            order: Math.random()
-          })
-          .then(() => {
-            router.push(`/rooms/${doc.id}`)
-          })
-      })
+    const doc = await db.collection('rooms').add({
+      host: user.uid
+    })
+    const userRef = db.collection('users').doc(user.uid)
+    await doc.collection('participants').add({
+      user: userRef,
+      order: Math.random()
+    })
+    router.push(`/rooms/${doc.id}`)
   }, [firebase, user])
   useEffect(() => {
     if (user === null) {
