@@ -1,10 +1,11 @@
 import 'firebase/firestore'
 import firebase from 'firebase/app'
-import { Button } from 'antd'
+import { Button, Row, Col } from 'antd'
 import { useEffect, useState, useContext, useMemo, useCallback } from 'react'
 import { User, Mission } from 'resources'
 import { GlobalContext } from 'components/App'
 import { LocationWatcher } from 'components/LocationWatcher'
+import { Block } from 'components/Block'
 
 type Props = {
   id: string
@@ -125,30 +126,42 @@ export const Quest: React.FC<Props> = ({ id, roundId }) => {
   }, [])
   return (
     <div>
-      {party.map(user => (
-        <span key={user.uid}>{user.name},</span>
-      ))}
-      のクエスト
+      <Block>
+        <h1>
+          {party.map(user => (
+            <span key={user.uid}>{user.name},</span>
+          ))}
+          のクエスト
+        </h1>
+      </Block>
       {isMember && !isChoose && (
-        <div>
-          <Button type="primary" onClick={success}>
-            成功
-          </Button>
-          <Button type="danger" onClick={failure}>
-            失敗
-          </Button>
-        </div>
+        <Block>
+          <Row>
+            <Col span={12} style={{ textAlign: 'center' }}>
+              <Button type="primary" onClick={success} size="large">
+                成功
+              </Button>
+            </Col>
+            <Col span={12} style={{ textAlign: 'center' }}>
+              <Button type="danger" onClick={failure} size="large">
+                失敗
+              </Button>
+            </Col>
+          </Row>
+        </Block>
       )}
       {missionResult !== null && (
-        <div>
-          <div>成功:&nbsp;{missionResult.success}</div>
-          <div>失敗:&nbsp;{missionResult.failure}</div>
-        </div>
+        <ul>
+          <li>成功:&nbsp;{missionResult.success}</li>
+          <li>失敗:&nbsp;{missionResult.failure}</li>
+        </ul>
       )}
       {missionResult !== null && isHost && (
-        <Button type="primary" onClick={gotoNextRound}>
-          次のラウンドへ
-        </Button>
+        <Block center>
+          <Button type="primary" onClick={gotoNextRound} size="large">
+            次のラウンドへ
+          </Button>
+        </Block>
       )}
       <LocationWatcher id={id} />
     </div>

@@ -1,10 +1,11 @@
 import 'firebase/firestore'
 import firebase from 'firebase/app'
-import { Switch, Button } from 'antd'
+import { Switch, Button, Row, Col } from 'antd'
 import { useEffect, useState, useCallback, useContext } from 'react'
 import { Maybe, User, Participant } from 'resources'
 import { GlobalContext } from 'components/App'
 import { LocationWatcher } from 'components/LocationWatcher'
+import { Block } from 'components/Block'
 
 type Props = {
   id: string
@@ -86,29 +87,33 @@ export const Round: React.FC<Props> = ({ id, roundId }) => {
   }, [])
   return (
     <div>
-      <div>{parent && `${parent.user.name}が選択中`}</div>
+      <Block>
+        <h1>{parent && `${parent.user.name}が選択中`}</h1>
+      </Block>
       {user && parent ? (
         user.uid === parent.user.uid ? (
           <>
-            <div>パーティを選択</div>
-            <div
-              style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}
-            >
-              {participants.map(participant => (
-                <div key={participant.uid}>
-                  <div>{participant.name}</div>
-                  <div>
-                    <Switch
-                      onChange={updateCandidates(participant)}
-                      checked={candidates.some(c => c === participant.uid)}
-                    ></Switch>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Button type="primary" onClick={startElection}>
-              クエストに行きたい
-            </Button>
+            <Block center>パーティを選択</Block>
+            <Block>
+              <Row>
+                {participants.map(participant => (
+                  <Col span={6} key={participant.uid}>
+                    <div>{participant.name}</div>
+                    <div>
+                      <Switch
+                        onChange={updateCandidates(participant)}
+                        checked={candidates.some(c => c === participant.uid)}
+                      ></Switch>
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            </Block>
+            <Block center style={{ marginTop: '3rem' }}>
+              <Button type="primary" onClick={startElection} size="large">
+                クエストに行きたい
+              </Button>
+            </Block>
           </>
         ) : null
       ) : null}

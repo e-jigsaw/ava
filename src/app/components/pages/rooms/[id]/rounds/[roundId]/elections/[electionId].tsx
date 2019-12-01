@@ -1,11 +1,12 @@
 import 'firebase/firestore'
 import firebase from 'firebase/app'
-import { Button } from 'antd'
+import { Button, Row, Col } from 'antd'
 import { useEffect, useState, useCallback, useContext, useMemo } from 'react'
 import { Props } from 'pages/rooms/[id]/rounds/[roundId]/elections/[electionId]'
 import { User, Maybe, Vote } from 'resources'
 import { GlobalContext } from 'components/App'
 import { LocationWatcher } from 'components/LocationWatcher'
+import { Block } from 'components/Block'
 
 export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
   const { user } = useContext(GlobalContext)
@@ -147,46 +148,54 @@ export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
   }, [party])
   return (
     <div>
-      <div>起案者:&nbsp;{owner ? owner.name : ''}</div>
-      <div>
+      <Block>起案者:&nbsp;{owner ? owner.name : ''}</Block>
+      <Block style={{ fontSize: '2rem' }}>
         パーティ:&nbsp;
         {party.map(member => (
           <span key={member.uid}>{member.name},&nbsp;</span>
         ))}
-      </div>
-      <div>
-        {!isIvoted && (
-          <>
-            <Button type="primary" onClick={agree}>
-              賛成
-            </Button>
-            <Button type="danger" onClick={disagree}>
-              反対
-            </Button>
-          </>
-        )}
-      </div>
-      <div>
-        {isFullfill && (
-          <>
+      </Block>
+      {!isIvoted && (
+        <Block>
+          <Row>
+            <Col span={12} style={{ textAlign: 'center' }}>
+              <Button type="primary" onClick={agree} size="large">
+                賛成
+              </Button>
+            </Col>
+            <Col span={12} style={{ textAlign: 'center' }}>
+              <Button type="danger" onClick={disagree} size="large">
+                反対
+              </Button>
+            </Col>
+          </Row>
+        </Block>
+      )}
+      {isFullfill && (
+        <>
+          <ul>
             {votes.map(vote => (
-              <div key={vote.voter.uid}>
+              <li key={vote.voter.uid}>
                 {vote.voter.name}:&nbsp;{vote.voting ? '賛成' : '反対'}
-              </div>
+              </li>
             ))}
-            {isHost && isWin && (
-              <Button type="primary" onClick={gotoQuest}>
+          </ul>
+          {isHost && isWin && (
+            <Block center>
+              <Button type="primary" onClick={gotoQuest} size="large">
                 クエストへ
               </Button>
-            )}
-            {isHost && !isWin && (
-              <Button type="primary" onClick={gotoNextElection}>
+            </Block>
+          )}
+          {isHost && !isWin && (
+            <Block center>
+              <Button type="primary" onClick={gotoNextElection} size="large">
                 次の投票へ
               </Button>
-            )}
-          </>
-        )}
-      </div>
+            </Block>
+          )}
+        </>
+      )}
       <LocationWatcher id={id} />
     </div>
   )

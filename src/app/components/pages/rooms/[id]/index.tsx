@@ -5,6 +5,7 @@ import { useEffect, useContext, useState, useMemo, useCallback } from 'react'
 import { GlobalContext } from 'components/App'
 import { Maybe, User } from 'resources'
 import { LocationWatcher } from 'components/LocationWatcher'
+import { Block } from 'components/Block'
 
 type Props = {
   id: string
@@ -81,27 +82,27 @@ export const Room: React.FC<Props> = ({ id }) => {
   }, [])
   return (
     <div>
-      <div>{isHost ? 'あなたはホストです' : 'あなたは参加者です'}</div>
-      <div>
-        {!isJoined && (
-          <Button type="primary" onClick={join}>
-            参加する
-          </Button>
-        )}
-      </div>
-      <div>参加者を待っています...</div>
-      <div>
+      <Block>{isHost ? 'あなたはホストです' : 'あなたは参加者です'}</Block>
+      <Block>参加者を待っています...</Block>
+      <Block>
         参加者:&nbsp;
         {participants.map(u => (
           <span key={u.uid}>{u.name},&nbsp;</span>
         ))}
-      </div>
+      </Block>
+      {!isJoined && (
+        <Block center>
+          <Button type="primary" onClick={join} size="large">
+            参加する
+          </Button>
+        </Block>
+      )}
       {isHost && (
-        <div>
-          <Button type="primary" onClick={createRound}>
+        <Block center>
+          <Button type="primary" onClick={createRound} size="large">
             ラウンドをスタート
           </Button>
-        </div>
+        </Block>
       )}
       <LocationWatcher id={id} />
     </div>

@@ -4,6 +4,7 @@ import { Button, Input, Row, Col } from 'antd'
 import { useCallback, useState, useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { GlobalContext } from 'components/App'
+import { Block } from 'components/Block'
 
 export const Top: React.FC = () => {
   const router = useRouter()
@@ -60,25 +61,31 @@ export const Top: React.FC = () => {
   return user ? (
     <>
       <div>Welcome!</div>
-      <Row>
-        <Col span={12}>
-          <Input
-            placeholder="なまえ"
-            value={name}
-            onChange={event => setName(event.currentTarget.value)}
-          ></Input>
-        </Col>
-        <Col span={4}>
-          <Button onClick={updateUser}>更新</Button>
-        </Col>
-      </Row>
-      <Button type="primary" onClick={createRoom}>
-        ルームを作成
-      </Button>
+      <Block>
+        <Row>
+          <Col span={12}>
+            <Input
+              placeholder="なまえ"
+              value={name}
+              onChange={event => setName(event.currentTarget.value)}
+            ></Input>
+          </Col>
+          <Col span={4}>
+            <Button onClick={updateUser}>更新</Button>
+          </Col>
+        </Row>
+      </Block>
+      <Block center>
+        <Button type="primary" onClick={createRoom} size="large">
+          ルームを作成
+        </Button>
+      </Block>
     </>
   ) : (
-    <Button type="primary" onClick={login}>
-      ログイン
-    </Button>
+    <Block center>
+      <Button type="primary" onClick={login} size="large">
+        ログイン
+      </Button>
+    </Block>
   )
 }
