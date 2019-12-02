@@ -123,16 +123,36 @@ export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
     )
     return agrees > participantCount / 2
   }, [isFullfill, votes])
-  const gotoNextElection = useCallback(() => {
-    firebase
+  const gotoNextElection = useCallback(async () => {
+    if (!owner) {
+      return
+    }
+    const room = firebase
       .firestore()
       .collection('rooms')
       .doc(id)
-      .update({
-        location: `/rooms/${id}/rounds/${roundId}`
-      })
-  }, [id, roundId])
+    await room.collection('digests').add({
+      createdAt: new Date().getTime(),
+      type: 'rejected',
+      party: party.map(member => member.name).join(','),
+      agreed: votes
+        .filter(vote => vote.voting)
+        .map(vote => vote.voter.name)
+        .join(','),
+      disagreed: votes
+        .filter(vote => !vote.voting)
+        .map(vote => vote.voter.name)
+        .join(','),
+      owner: owner.name
+    })
+    room.update({
+      location: `/rooms/${id}/rounds/${roundId}`
+    })
+  }, [votes, party, owner])
   const gotoQuest = useCallback(async () => {
+    if (!owner) {
+      return
+    }
     const db = firebase.firestore()
     const partyRef = party.map(user => db.collection('users').doc(user.uid))
     const room = db.collection('rooms').doc(id)
@@ -142,12 +162,26 @@ export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
       .update({
         party: partyRef
       })
+    await room.collection('digests').add({
+      createdAt: new Date().getTime(),
+      type: 'accepted',
+      party: party.map(member => member.name).join(','),
+      agreed: votes
+        .filter(vote => vote.voting)
+        .map(vote => vote.voter.name)
+        .join(','),
+      disagreed: votes
+        .filter(vote => !vote.voting)
+        .map(vote => vote.voter.name)
+        .join(','),
+      owner: owner.name
+    })
     room.update({
       location: `/rooms/${id}/rounds/${roundId}/quest`
     })
-  }, [party])
+  }, [party, votes, owner])
   return (
-    <div>
+    <>
       <Block>起案者:&nbsp;{owner ? owner.name : ''}</Block>
       <Block style={{ fontSize: '2rem' }}>
         パーティ:&nbsp;
@@ -197,6 +231,6 @@ export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
         </>
       )}
       <LocationWatcher id={id} />
-    </div>
+    </>
   )
 }

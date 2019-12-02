@@ -81,7 +81,7 @@ export const Room: React.FC<Props> = ({ id }) => {
     })
   }, [])
   return (
-    <div>
+    <>
       <Block>{isHost ? 'あなたはホストです' : 'あなたは参加者です'}</Block>
       <Block>参加者を待っています...</Block>
       <Block>
@@ -105,6 +105,6 @@ export const Room: React.FC<Props> = ({ id }) => {
         </Block>
       )}
       <LocationWatcher id={id} />
-    </div>
+    </>
   )
 }

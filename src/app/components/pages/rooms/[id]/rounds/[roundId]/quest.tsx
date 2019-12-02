@@ -107,8 +107,18 @@ export const Quest: React.FC<Props> = ({ id, roundId }) => {
       })
   }, [user])
   const gotoNextRound = useCallback(async () => {
+    if (!missionResult) {
+      return
+    }
     const db = firebase.firestore()
     const room = db.collection('rooms').doc(id)
+    await room.collection('digests').add({
+      createdAt: new Date().getTime(),
+      type: 'quest',
+      party: party.map(member => member.name).join(','),
+      success: missionResult.success,
+      failure: missionResult.failure
+    })
     const doc = await room
       .collection('rounds')
       .doc(roundId)
@@ -123,9 +133,9 @@ export const Quest: React.FC<Props> = ({ id, roundId }) => {
     room.update({
       location: `/rooms/${id}/rounds/${next.id}`
     })
-  }, [])
+  }, [party, missionResult])
   return (
-    <div>
+    <>
       <Block>
         <h1>
           {party.map(user => (
@@ -164,6 +174,6 @@ export const Quest: React.FC<Props> = ({ id, roundId }) => {
         </Block>
       )}
       <LocationWatcher id={id} />
-    </div>
+    </>
   )
 }

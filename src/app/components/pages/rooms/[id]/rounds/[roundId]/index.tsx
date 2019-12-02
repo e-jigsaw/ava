@@ -86,38 +86,36 @@ export const Round: React.FC<Props> = ({ id, roundId }) => {
       })
   }, [])
   return (
-    <div>
+    <>
       <Block>
         <h1>{parent && `${parent.user.name}が選択中`}</h1>
       </Block>
-      {user && parent ? (
-        user.uid === parent.user.uid ? (
-          <>
-            <Block center>パーティを選択</Block>
-            <Block>
-              <Row>
-                {participants.map(participant => (
-                  <Col span={6} key={participant.uid}>
-                    <div>{participant.name}</div>
-                    <div>
-                      <Switch
-                        onChange={updateCandidates(participant)}
-                        checked={candidates.some(c => c === participant.uid)}
-                      ></Switch>
-                    </div>
-                  </Col>
-                ))}
-              </Row>
-            </Block>
-            <Block center style={{ marginTop: '3rem' }}>
-              <Button type="primary" onClick={startElection} size="large">
-                クエストに行きたい
-              </Button>
-            </Block>
-          </>
-        ) : null
-      ) : null}
+      {user && parent && user.uid === parent.user.uid && (
+        <>
+          <Block center>パーティを選択</Block>
+          <Block>
+            <Row>
+              {participants.map(participant => (
+                <Col span={6} key={participant.uid}>
+                  <div>{participant.name}</div>
+                  <div>
+                    <Switch
+                      onChange={updateCandidates(participant)}
+                      checked={candidates.some(c => c === participant.uid)}
+                    ></Switch>
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          </Block>
+          <Block center style={{ marginTop: '3rem' }}>
+            <Button type="primary" onClick={startElection} size="large">
+              クエストに行きたい
+            </Button>
+          </Block>
+        </>
+      )}
       <LocationWatcher id={id} />
-    </div>
+    </>
   )
 }
