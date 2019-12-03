@@ -2,7 +2,7 @@ import 'firebase/firestore'
 import firebase from 'firebase/app'
 import { Button } from 'antd'
 import { useEffect, useContext, useState, useMemo, useCallback } from 'react'
-import { GlobalContext } from 'components/App'
+import { GlobalContext } from 'pages/_app'
 import { Maybe, User } from 'resources'
 import { LocationWatcher } from 'components/LocationWatcher'
 import { Block } from 'components/Block'
@@ -11,7 +11,7 @@ type Props = {
   id: string
 }
 
-export const Room: React.FC<Props> = ({ id }) => {
+const Room: React.FC<Props> = ({ id }) => {
   const { user } = useContext(GlobalContext)
   const [room, setRoom] = useState<Maybe<firebase.firestore.DocumentData>>(null)
   const [participants, setParticipants] = useState<User[]>([])
@@ -77,7 +77,8 @@ export const Room: React.FC<Props> = ({ id }) => {
       parent: parentQuery.docs[0].data()
     })
     roomRef.update({
-      location: `/rooms/${id}/rounds/${doc.id}`
+      as: `/rooms/${id}/rounds/${doc.id}`,
+      location: '/rooms/[id]/rounds/[roundId]'
     })
   }, [])
   return (
@@ -108,3 +109,5 @@ export const Room: React.FC<Props> = ({ id }) => {
     </>
   )
 }
+
+export default Room

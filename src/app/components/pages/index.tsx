@@ -3,10 +3,10 @@ import firebase from 'firebase/app'
 import { Button, Input, Row, Col } from 'antd'
 import { useCallback, useState, useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { GlobalContext } from 'components/App'
+import { GlobalContext } from 'pages/_app'
 import { Block } from 'components/Block'
 
-export const Top: React.FC = () => {
+const Top: React.FC = () => {
   const router = useRouter()
   const { user } = useContext(GlobalContext)
   const login = useCallback(() => {
@@ -39,7 +39,7 @@ export const Top: React.FC = () => {
       user: userRef,
       order: Math.random()
     })
-    router.push(`/rooms/${doc.id}`)
+    router.push('/rooms/[id]', `/rooms/${doc.id}`)
   }, [firebase, user])
   useEffect(() => {
     if (user === null) {
@@ -89,3 +89,5 @@ export const Top: React.FC = () => {
     </Block>
   )
 }
+
+export default Top

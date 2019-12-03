@@ -3,16 +3,17 @@ import firebase from 'firebase/app'
 import { Button, Row, Col } from 'antd'
 import { useEffect, useState, useContext, useMemo, useCallback } from 'react'
 import { User, Mission } from 'resources'
-import { GlobalContext } from 'components/App'
+import { GlobalContext } from 'pages/_app'
 import { LocationWatcher } from 'components/LocationWatcher'
 import { Block } from 'components/Block'
+import { Digests } from 'components/Digests'
 
 type Props = {
   id: string
   roundId: string
 }
 
-export const Quest: React.FC<Props> = ({ id, roundId }) => {
+const Quest: React.FC<Props> = ({ id, roundId }) => {
   const { user } = useContext(GlobalContext)
   const [party, setParty] = useState<User[]>([])
   const [mission, setMission] = useState<Mission[]>([])
@@ -131,7 +132,8 @@ export const Quest: React.FC<Props> = ({ id, roundId }) => {
       parent: data.parent
     })
     room.update({
-      location: `/rooms/${id}/rounds/${next.id}`
+      as: `/rooms/${id}/rounds/${next.id}`,
+      location: '/rooms/[id]/rounds/[roundId]'
     })
   }, [party, missionResult])
   return (
@@ -173,7 +175,10 @@ export const Quest: React.FC<Props> = ({ id, roundId }) => {
           </Button>
         </Block>
       )}
+      <Digests id={id} />
       <LocationWatcher id={id} />
     </>
   )
 }
+
+export default Quest

@@ -1,15 +1,7 @@
 import { NextPage } from 'next'
 import dynamic from 'next/dynamic'
-import { Top } from 'components/pages'
+const Top = dynamic(() => import('components/pages'), { ssr: false })
 
-const App = dynamic(() => import('components/App'), { ssr: false })
-
-const TopPage: NextPage = () => {
-  return (
-    <App>
-      <Top></Top>
-    </App>
-  )
-}
+const TopPage: NextPage = () => <Top></Top>
 
 export default TopPage

@@ -28,7 +28,8 @@ module.exports = withCss({
     config.resolve.alias = {
       ...config.resolve.alias,
       components: createAlias('components'),
-      resources: createAlias('resources')
+      resources: createAlias('resources'),
+      pages: createAlias('pages')
     }
     return config
   },

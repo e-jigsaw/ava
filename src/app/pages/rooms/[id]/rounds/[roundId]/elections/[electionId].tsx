@@ -1,10 +1,15 @@
 import { NextPage } from 'next'
 import dynamic from 'next/dynamic'
-import { Election } from 'components/pages/rooms/[id]/rounds/[roundId]/elections/[electionId]'
 
-const App = dynamic(() => import('components/App'), {
-  ssr: false
-})
+const Election = dynamic(
+  () =>
+    import(
+      'components/pages/rooms/[id]/rounds/[roundId]/elections/[electionId]'
+    ),
+  {
+    ssr: false
+  }
+)
 
 export type Props = {
   id: string
@@ -12,11 +17,7 @@ export type Props = {
   electionId: string
 }
 
-const ElectionPage: NextPage<Props> = props => (
-  <App>
-    <Election {...props} />
-  </App>
-)
+const ElectionPage: NextPage<Props> = props => <Election {...props} />
 
 ElectionPage.getInitialProps = async ({ query }) => {
   return {

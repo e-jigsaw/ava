@@ -3,16 +3,17 @@ import firebase from 'firebase/app'
 import { Switch, Button, Row, Col } from 'antd'
 import { useEffect, useState, useCallback, useContext } from 'react'
 import { Maybe, User, Participant } from 'resources'
-import { GlobalContext } from 'components/App'
+import { GlobalContext } from 'pages/_app'
 import { LocationWatcher } from 'components/LocationWatcher'
 import { Block } from 'components/Block'
+import { Digests } from 'components/Digests'
 
 type Props = {
   id: string
   roundId: string
 }
 
-export const Round: React.FC<Props> = ({ id, roundId }) => {
+const Round: React.FC<Props> = ({ id, roundId }) => {
   const { user } = useContext(GlobalContext)
   const [participants, setParticipants] = useState<User[]>([])
   const [parent, setParent] = useState<Maybe<Participant>>(null)
@@ -56,7 +57,8 @@ export const Round: React.FC<Props> = ({ id, roundId }) => {
       owner: db.collection('users').doc(user.uid)
     })
     roomRef.update({
-      location: `/rooms/${id}/rounds/${roundId}/elections/${doc.id}`
+      as: `/rooms/${id}/rounds/${roundId}/elections/${doc.id}`,
+      location: '/rooms/[id]/rounds/[roundId]/elections/[electionId]'
     })
   }, [candidates, user, parent])
   useEffect(() => {
@@ -115,7 +117,10 @@ export const Round: React.FC<Props> = ({ id, roundId }) => {
           </Block>
         </>
       )}
+      <Digests id={id} />
       <LocationWatcher id={id} />
     </>
   )
 }
+
+export default Round

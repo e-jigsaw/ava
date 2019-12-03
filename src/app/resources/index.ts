@@ -19,3 +19,22 @@ export type Mission = {
   choice: boolean
   uid: string
 }
+
+type ElectionDigest = {
+  createdAt: number
+  type: 'rejected' | 'accepted'
+  party: string
+  agreed: string
+  disagreed: string
+  owner: string
+}
+
+type QuestDigest = {
+  createdAt: number
+  type: 'quest'
+  party: string
+  success: number
+  failure: number
+}
+
+export type Digest = ElectionDigest | QuestDigest

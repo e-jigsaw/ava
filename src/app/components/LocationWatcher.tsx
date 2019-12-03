@@ -17,9 +17,9 @@ export const LocationWatcher: React.FC<Props> = ({ id }) => {
       .onSnapshot(doc => {
         const data = doc.data()
         if (data) {
-          if (data.location) {
-            if (location.pathname !== data.location) {
-              router.push(data.location)
+          if (data.location && data.as) {
+            if (location.pathname !== data.as) {
+              router.push(data.location, data.as)
             }
           }
         }

@@ -4,11 +4,12 @@ import { Button, Row, Col } from 'antd'
 import { useEffect, useState, useCallback, useContext, useMemo } from 'react'
 import { Props } from 'pages/rooms/[id]/rounds/[roundId]/elections/[electionId]'
 import { User, Maybe, Vote } from 'resources'
-import { GlobalContext } from 'components/App'
+import { GlobalContext } from 'pages/_app'
 import { LocationWatcher } from 'components/LocationWatcher'
 import { Block } from 'components/Block'
+import { Digests } from 'components/Digests'
 
-export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
+const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
   const { user } = useContext(GlobalContext)
   const [owner, setOwner] = useState<Maybe<User>>(null)
   const [party, setParty] = useState<User[]>([])
@@ -146,7 +147,8 @@ export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
       owner: owner.name
     })
     room.update({
-      location: `/rooms/${id}/rounds/${roundId}`
+      as: `/rooms/${id}/rounds/${roundId}`,
+      location: '/rooms/[id]/rounds/[roundId]'
     })
   }, [votes, party, owner])
   const gotoQuest = useCallback(async () => {
@@ -177,7 +179,8 @@ export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
       owner: owner.name
     })
     room.update({
-      location: `/rooms/${id}/rounds/${roundId}/quest`
+      as: `/rooms/${id}/rounds/${roundId}/quest`,
+      location: '/rooms/[id]/rounds/[roundId]/quest'
     })
   }, [party, votes, owner])
   return (
@@ -230,7 +233,10 @@ export const Election: React.FC<Props> = ({ id, roundId, electionId }) => {
           )}
         </>
       )}
+      <Digests id={id} />
       <LocationWatcher id={id} />
     </>
   )
 }
+
+export default Election

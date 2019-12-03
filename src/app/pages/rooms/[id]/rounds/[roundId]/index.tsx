@@ -1,10 +1,12 @@
 import { NextPage } from 'next'
 import dynamic from 'next/dynamic'
-import { Round } from 'components/pages/rooms/[id]/rounds/[roundId]'
 
-const App = dynamic(() => import('components/App'), {
-  ssr: false
-})
+const Round = dynamic(
+  () => import('components/pages/rooms/[id]/rounds/[roundId]'),
+  {
+    ssr: false
+  }
+)
 
 type Props = {
   id: string
@@ -12,9 +14,7 @@ type Props = {
 }
 
 const RoundPage: NextPage<Props> = ({ id, roundId }) => (
-  <App>
-    <Round id={id} roundId={roundId}></Round>
-  </App>
+  <Round id={id} roundId={roundId}></Round>
 )
 
 RoundPage.getInitialProps = async ({ query }) => {
