@@ -3,7 +3,7 @@
   "name": "ava",
   "description": "",
   "engines": {
-    "node": "14"
+    "node": "14.x"
   },
   "scripts": {
     "dev": "next -p 3333"
