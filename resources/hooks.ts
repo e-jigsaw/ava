@@ -70,3 +70,15 @@ export const useIsHost = id => {
   }, [user, room])
   return isHost
 }
+
+export const useRound = roundId => {
+  const [round, setRound] = useState(null)
+  useEffect(() => {
+    supabase
+      .from('rounds')
+      .select()
+      .eq('id', roundId)
+      .then(res => setRound(res.data[0]))
+  }, [])
+  return round
+}

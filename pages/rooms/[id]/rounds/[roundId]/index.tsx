@@ -2,7 +2,7 @@ import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from 'resources'
-import { useParticipants, useUser } from 'resources/hooks'
+import { useParticipants, useRound, useUser } from 'resources/hooks'
 
 type Props = {
   id: string
@@ -24,14 +24,7 @@ const RoundPage: NextPage<Props> = ({ id, roundId }) => {
   const router = useRouter()
   const [user] = useUser()
   const participants = useParticipants(id)
-  const [round, setRound] = useState(null)
-  useEffect(() => {
-    supabase
-      .from('rounds')
-      .select()
-      .eq('id', roundId)
-      .then(res => setRound(res.data[0]))
-  }, [])
+  const round = useRound(roundId)
   const parent = useMemo(() => {
     if (participants.length > 0 && round) {
       return participants[round.parent]
