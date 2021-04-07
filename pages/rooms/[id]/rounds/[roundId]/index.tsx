@@ -1,3 +1,4 @@
+import { Header } from 'components/Header'
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -45,15 +46,21 @@ const RoundPage: NextPage<Props> = ({ id, roundId }) => {
         by: parent.name
       }
     ])
+    await supabase
+      .from('rooms')
+      .update({
+        site: `/rooms/${id}/rounds/${roundId}/elections/${data[0].id}`
+      })
+      .match({ id })
     router.push(`/rooms/${id}/rounds/${roundId}/elections/${data[0].id}`)
   }, [roundId, parent])
   if (parent && user) {
     return (
       <div>
+        <Header></Header>
         <div>{parent.name}が選択中...</div>
         {user && parent.userId === user.id && (
           <div>
-            <div>パーティを選択</div>
             {participants.map(p => (
               <div key={p.id}>
                 <input type="checkbox"></input>
@@ -61,7 +68,9 @@ const RoundPage: NextPage<Props> = ({ id, roundId }) => {
               </div>
             ))}
             <div>
-              <button onClick={startElection}>クエストにいく</button>
+              <button onClick={startElection}>
+                選択したメンバーでクエストに行きたい
+              </button>
             </div>
           </div>
         )}

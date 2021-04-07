@@ -1,3 +1,4 @@
+import { Header } from 'components/Header'
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -77,19 +78,21 @@ const ElectionPage: NextPage<Props> = ({ id, roundId, electionId }) => {
     }
     return false
   }, [votes, user])
-  const participantWithVotes = useMemo(
-    () =>
-      participants.map(p => ({
-        ...p,
-        isVoted: votes.some(vote => vote.userId === p.userId)
-      })),
-    [participants, votes]
-  )
   const isFullfilled = useMemo(
     () =>
       participants.length > 0 ? participants.length === votes.length : false,
     [participants, votes]
   )
+  const participantWithVotes = useMemo(() => {
+    if (isFullfilled) {
+      return participants.map(p => ({
+        ...p,
+        isVoted: votes.some(vote => vote.userId === p.userId),
+        agreed: votes.find(vote => vote.userId === p.userId).agreed
+      }))
+    }
+    return []
+  }, [participants, votes, isFullfilled])
   const isHost = useIsHost(id)
   const isWin = useMemo(() => {
     if (isFullfilled && votes.length > 0 && participants.length > 0) {
@@ -111,6 +114,10 @@ const ElectionPage: NextPage<Props> = ({ id, roundId, electionId }) => {
       .from('rounds')
       .update({ parent: next })
       .match({ id: roundId })
+    await supabase
+      .from('rooms')
+      .update({ site: `/rooms/${id}/rounds/${roundId}` })
+      .match({ id })
     router.push(`/rooms/${id}/rounds/${roundId}`)
   }, [participants, roundId])
   const gotoQuest = useCallback(async () => {
@@ -120,11 +127,16 @@ const ElectionPage: NextPage<Props> = ({ id, roundId, electionId }) => {
         roundId
       }
     ])
+    await supabase
+      .from('rooms')
+      .update({ site: `/rooms/${id}/rounds/${roundId}/quests/${data[0].id}` })
+      .match({ id })
     router.push(`/rooms/${id}/rounds/${roundId}/quests/${data[0].id}`)
   }, [election, roundId])
   if (election && participants.length > 0) {
     return (
       <div>
+        <Header></Header>
         <div>提案者:&nbsp;{election.by}</div>
         <div>
           パーティ:&nbsp;

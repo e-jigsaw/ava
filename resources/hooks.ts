@@ -25,6 +25,15 @@ export const useRoom = id => {
       .then(res => {
         setRoom(res.data[0])
       })
+    const sub = supabase
+      .from(`rooms:id=eq.${id}`)
+      .on('UPDATE', payload => {
+        setRoom(payload.new)
+      })
+      .subscribe()
+    return () => {
+      supabase.removeSubscription(sub)
+    }
   }, [])
   return room
 }

@@ -1,3 +1,4 @@
+import { Header } from 'components/Header'
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -84,7 +85,7 @@ const QuestPage: NextPage<Props> = ({ id, questId, roundId }) => {
   }, [questId, user])
   const isChoose = useMemo(() => {
     if (choices.length > 0 && user) {
-      choices.some(c => c.userId === user.id)
+      return choices.some(c => c.userId === user.id)
     }
     return false
   }, [choices, user])
@@ -120,17 +121,22 @@ const QuestPage: NextPage<Props> = ({ id, questId, roundId }) => {
         parent: next
       }
     ])
+    await supabase
+      .from('rooms')
+      .update({ site: `/rooms/${id}/rounds/${data[0].id}` })
+      .match({ id })
     router.push(`/rooms/${id}/rounds/${data[0].id}`)
   }, [roundId, participants, id])
   return (
     <div>
+      <Header></Header>
       <div>
         {party.map(p => (
           <span key={p.id}>{p.name},&nbsp;</span>
         ))}
         のクエスト
       </div>
-      {isMember && isChoose && (
+      {isMember && !isChoose && (
         <div>
           <button onClick={success}>成功</button>
           <button onClick={failure}>失敗</button>

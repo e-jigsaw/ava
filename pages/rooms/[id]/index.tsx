@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useMemo, useCallback } from 'react'
 import { supabase } from 'resources'
 import { useIsHost, useParticipants, useUser } from 'resources/hooks'
+import { Header } from 'components/Header'
 
 type Props = {
   id: string
@@ -48,10 +49,15 @@ const RoomPage: NextPage<Props> = ({ id }) => {
         roomId: id
       }
     ])
+    await supabase
+      .from('rooms')
+      .update({ site: `/rooms/${id}/rounds/${data[0].id}` })
+      .match({ id })
     router.push(`/rooms/${id}/rounds/${data[0].id}`)
   }, [id, participants])
   return (
     <div>
+      <Header></Header>
       <div>{isHost ? 'あなたはホストです' : 'あなたは参加者です'}</div>
       <div>参加者を待っています...</div>
       <div>
