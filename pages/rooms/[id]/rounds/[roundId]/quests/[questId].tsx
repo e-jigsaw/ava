@@ -12,14 +12,14 @@ type Props = {
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query
+  query,
 }) => {
   return {
     props: {
       id: query.id as string,
       roundId: query.roundId as string,
-      questId: query.questId as string
-    }
+      questId: query.questId as string,
+    },
   }
 }
 
@@ -30,13 +30,13 @@ const QuestPage: NextPage<Props> = ({ id, questId, roundId }) => {
   const [choices, setChoices] = useState([])
   const party = useMemo(() => {
     if (participants.length > 0 && quest) {
-      return quest.party.map(index => participants[index])
+      return quest.party.map((index) => participants[index])
     }
     return []
   }, [participants, quest])
   const isMember = useMemo(() => {
     if (party.length > 0 && user) {
-      return party.some(p => p.userId === user.id)
+      return party.some((p) => p.userId === user.id)
     }
     return false
   }, [user, party])
@@ -45,12 +45,12 @@ const QuestPage: NextPage<Props> = ({ id, questId, roundId }) => {
       .from('quests')
       .select()
       .eq('id', questId)
-      .then(res => setQuest(res.data[0]))
+      .then((res) => setQuest(res.data[0]))
     supabase
       .from('choices')
       .select()
       .eq('questId', questId)
-      .then(res => setChoices([...res.data]))
+      .then((res) => setChoices([...res.data]))
     const sub = supabase
       .from(`choices:questId=eq.${questId}`)
       .on('*', () => {
@@ -58,7 +58,7 @@ const QuestPage: NextPage<Props> = ({ id, questId, roundId }) => {
           .from('choices')
           .select()
           .eq('questId', questId)
-          .then(res => setChoices([...res.data]))
+          .then((res) => setChoices([...res.data]))
       })
       .subscribe()
     return () => {
@@ -70,8 +70,8 @@ const QuestPage: NextPage<Props> = ({ id, questId, roundId }) => {
       {
         questId,
         userId: user.id,
-        succeed: true
-      }
+        succeed: true,
+      },
     ])
   }, [questId, user])
   const failure = useCallback(async () => {
@@ -79,13 +79,13 @@ const QuestPage: NextPage<Props> = ({ id, questId, roundId }) => {
       {
         questId,
         userId: user.id,
-        succeed: false
-      }
+        succeed: false,
+      },
     ])
   }, [questId, user])
   const isChoose = useMemo(() => {
     if (choices.length > 0 && user) {
-      return choices.some(c => c.userId === user.id)
+      return choices.some((c) => c.userId === user.id)
     }
     return false
   }, [choices, user])
@@ -98,8 +98,8 @@ const QuestPage: NextPage<Props> = ({ id, questId, roundId }) => {
   const result = useMemo(() => {
     if (isFullfilled) {
       return [
-        choices.filter(c => c.succeed).length,
-        choices.filter(c => !c.succeed).length
+        choices.filter((c) => c.succeed).length,
+        choices.filter((c) => !c.succeed).length,
       ]
     }
     return [0, 0]
@@ -118,8 +118,8 @@ const QuestPage: NextPage<Props> = ({ id, questId, roundId }) => {
     const { data } = await supabase.from('rounds').insert([
       {
         roomId: id,
-        parent: next
-      }
+        parent: next,
+      },
     ])
     await supabase
       .from('rooms')
@@ -128,29 +128,54 @@ const QuestPage: NextPage<Props> = ({ id, questId, roundId }) => {
     router.push(`/rooms/${id}/rounds/${data[0].id}`)
   }, [roundId, participants, id])
   return (
-    <div>
+    <div className="p-4">
       <Header></Header>
-      <div>
-        {party.map(p => (
+      <div className="text-3xl text-center">
+        {party.map((p) => (
           <span key={p.id}>{p.name},&nbsp;</span>
         ))}
         のクエスト
       </div>
       {isMember && !isChoose && (
-        <div>
-          <button onClick={success}>成功</button>
-          <button onClick={failure}>失敗</button>
+        <div className="flex justify-around my-8">
+          <button
+            onClick={success}
+            className="bg-green-500 text-3xl text-white rounded px-4 py-2"
+          >
+            成功
+          </button>
+          <button
+            onClick={failure}
+            className="text-3xl text-white rounded px-4 py-2 bg-red-500"
+          >
+            失敗
+          </button>
         </div>
       )}
       {isFullfilled && (
-        <div>
-          <div>成功:&nbsp;{result[0]}</div>
-          <div>失敗:&nbsp;{result[1]}</div>
+        <div className="mt-2">
+          <div>
+            <span className="text-xl text-white bg-green-500 p-1 rounded">
+              成功
+            </span>
+            <span className="text-2xl ml-1 p-1">{result[0]}</span>
+          </div>
+          <div className="mt-1">
+            <span className="text-xl text-white bg-red-500 p-1 rounded">
+              失敗
+            </span>
+            <span className="text-2xl ml-1 p-1">{result[1]}</span>
+          </div>
         </div>
       )}
       {isFullfilled && isHost && (
-        <div>
-          <button onClick={gotoNextRound}>次のラウンドへ</button>
+        <div className="flex flex-col items-center mt-4">
+          <button
+            onClick={gotoNextRound}
+            className="bg-green-500 text-2xl text-white rounded px-4 py-2"
+          >
+            次のラウンドへ
+          </button>
         </div>
       )}
     </div>

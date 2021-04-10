@@ -13,10 +13,12 @@ export const Header = () => {
     return false
   }, [router.asPath, room])
   return (
-    <div>
+    <div className="p-4 flex flex-col items-center fixed bottom-0 left-0 w-full">
       {room && !isMatchSite && (
         <Link href={room.site}>
-          <button>現場へ</button>
+          <button className="text-2xl bg-green-500 text-white rounded py-2 px-8">
+            現場へ
+          </button>
         </Link>
       )}
     </div>

@@ -11,13 +11,13 @@ type Props = {
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query
+  query,
 }) => {
   return {
     props: {
       id: query.id as string,
-      roundId: query.roundId as string
-    }
+      roundId: query.roundId as string,
+    },
   }
 }
 
@@ -43,32 +43,41 @@ const RoundPage: NextPage<Props> = ({ id, roundId }) => {
       {
         roundId: roundId,
         party,
-        by: parent.name
-      }
+        by: parent.name,
+      },
     ])
     await supabase
       .from('rooms')
       .update({
-        site: `/rooms/${id}/rounds/${roundId}/elections/${data[0].id}`
+        site: `/rooms/${id}/rounds/${roundId}/elections/${data[0].id}`,
       })
       .match({ id })
     router.push(`/rooms/${id}/rounds/${roundId}/elections/${data[0].id}`)
   }, [roundId, parent])
   if (parent && user) {
     return (
-      <div>
+      <div className="p-4">
         <Header></Header>
-        <div>{parent.name}が選択中...</div>
+        <div className="text-2xl text-center">{parent.name}が選択中...</div>
         {user && parent.userId === user.id && (
           <div>
-            {participants.map(p => (
-              <div key={p.id}>
-                <input type="checkbox"></input>
-                {p.name}
+            {participants.map((p) => (
+              <div key={p.id} className="text-lg mb-1">
+                <input
+                  type="checkbox"
+                  id={p.id}
+                  className="scale-150 transform"
+                ></input>
+                <label htmlFor={p.id} className="ml-2">
+                  {p.name}
+                </label>
               </div>
             ))}
             <div>
-              <button onClick={startElection}>
+              <button
+                onClick={startElection}
+                className="text-xl bg-green-500 text-white rounded px-4 py-2 mt-8"
+              >
                 選択したメンバーでクエストに行きたい
               </button>
             </div>

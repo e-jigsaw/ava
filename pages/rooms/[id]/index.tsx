@@ -10,12 +10,12 @@ type Props = {
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query
+  query,
 }) => {
   return {
     props: {
-      id: query.id as string
-    }
+      id: query.id as string,
+    },
   }
 }
 
@@ -33,8 +33,8 @@ const RoomPage: NextPage<Props> = ({ id }) => {
         roomId: id,
         userId: user.id,
         order: Math.random(),
-        name
-      }
+        name,
+      },
     ])
   }, [id, user, name])
   const isJoined = useMemo(() => {
@@ -46,8 +46,8 @@ const RoomPage: NextPage<Props> = ({ id }) => {
   const createRound = useCallback(async () => {
     const { data } = await supabase.from('rounds').insert([
       {
-        roomId: id
-      }
+        roomId: id,
+      },
     ])
     await supabase
       .from('rooms')
@@ -55,25 +55,36 @@ const RoomPage: NextPage<Props> = ({ id }) => {
       .match({ id })
     router.push(`/rooms/${id}/rounds/${data[0].id}`)
   }, [id, participants])
+  console.log(participants)
   return (
-    <div>
+    <div className="p-4">
       <Header></Header>
-      <div>{isHost ? 'あなたはホストです' : 'あなたは参加者です'}</div>
-      <div>参加者を待っています...</div>
-      <div>
+      {isHost && <div className="text-center text-2xl">あなたはホストです</div>}
+      <div className="text-center text-xs">参加者を待っています...</div>
+      <div className="mt-4 text-lg">
         参加者:&nbsp;
-        {participants.map(p => (
+        {participants.map((p) => (
           <span key={p.userId}>{p.name},&nbsp;</span>
         ))}
       </div>
       {!isJoined && (
-        <div>
-          <button onClick={join}>参加する</button>
+        <div className="flex flex-col items-center">
+          <button
+            onClick={join}
+            className="text-3xl bg-green-500 text-white rounded px-4 py-2 mt-8"
+          >
+            参加する
+          </button>
         </div>
       )}
       {isHost && (
-        <div>
-          <button onClick={createRound}>ラウンドをスタート</button>
+        <div className="flex flex-col items-center">
+          <button
+            onClick={createRound}
+            className="text-3xl bg-green-500 text-white rounded px-4 py-2 mt-8"
+          >
+            ラウンドをスタート
+          </button>
         </div>
       )}
     </div>

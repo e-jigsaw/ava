@@ -8,7 +8,7 @@ const TopPage: NextPage = () => {
   const [email, setEmail] = useState('')
   const login = useCallback(async () => {
     await supabase.auth.signIn({
-      email
+      email,
     })
     alert('マジックリンクメールを送信しました')
   }, [email])
@@ -26,30 +26,47 @@ const TopPage: NextPage = () => {
     }
     await supabase.auth.update({
       data: {
-        name
-      }
+        name,
+      },
     })
     alert('保存しました')
   }, [user, name])
   return user ? (
-    <div>
-      <div>Welcome!</div>
+    <div className="p-4">
+      <div className="text-center text-4xl pb-4">Welcome!</div>
       <div>
+        <div>名前を入力して保存してね</div>
         <input
           placeholder="なまえ"
           value={name}
-          onChange={event => setName(event.currentTarget.value)}
+          onChange={(event) => setName(event.currentTarget.value)}
+          className="border border-gray-500 text-2xl mr-2 rounded p-1"
         ></input>
-        <button onClick={updateUser}>保存</button>
+        <button
+          onClick={updateUser}
+          className="text-2xl border border-gray-500 rounded p-1"
+        >
+          保存
+        </button>
       </div>
     </div>
   ) : (
-    <div>
-      <input
-        value={email}
-        onChange={event => setEmail(event.currentTarget.value)}
-      ></input>
-      <button onClick={login}>ログイン</button>
+    <div className="p-4">
+      <div>メアドを入力してね</div>
+      <div>
+        <input
+          placeholder="merlin@arthur.com"
+          value={email}
+          onChange={(event) => setEmail(event.currentTarget.value)}
+          className="border border-gray-500 text-2xl mr-2 rounded p-1"
+        ></input>
+        <button
+          onClick={login}
+          className="text-2xl border border-gray-500 rounded p-1"
+        >
+          ログイン
+        </button>
+      </div>
     </div>
   )
 }

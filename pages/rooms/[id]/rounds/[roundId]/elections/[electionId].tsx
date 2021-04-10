@@ -6,14 +6,14 @@ import { supabase } from 'resources'
 import { useIsHost, useParticipants, useUser } from 'resources/hooks'
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query
+  query,
 }) => {
   return {
     props: {
       id: query.id as string,
       roundId: query.roundId as string,
-      electionId: query.electionId as string
-    }
+      electionId: query.electionId as string,
+    },
   }
 }
 
@@ -34,12 +34,12 @@ const ElectionPage: NextPage<Props> = ({ id, roundId, electionId }) => {
       .from('elections')
       .select()
       .eq('id', electionId)
-      .then(res => setElection(res.data[0]))
+      .then((res) => setElection(res.data[0]))
     supabase
       .from('votes')
       .select()
       .eq('electionId', electionId)
-      .then(res => setVotes([...res.data]))
+      .then((res) => setVotes([...res.data]))
     const sub = supabase
       .from(`votes:electionId=eq.${electionId}`)
       .on('*', () => {
@@ -47,7 +47,7 @@ const ElectionPage: NextPage<Props> = ({ id, roundId, electionId }) => {
           .from('votes')
           .select()
           .eq('electionId', electionId)
-          .then(res => setVotes([...res.data]))
+          .then((res) => setVotes([...res.data]))
       })
       .subscribe()
     return () => {
@@ -59,8 +59,8 @@ const ElectionPage: NextPage<Props> = ({ id, roundId, electionId }) => {
       {
         userId: user.id,
         electionId,
-        agreed: true
-      }
+        agreed: true,
+      },
     ])
   }, [user, electionId])
   const disagree = useCallback(async () => {
@@ -68,13 +68,13 @@ const ElectionPage: NextPage<Props> = ({ id, roundId, electionId }) => {
       {
         userId: user.id,
         electionId,
-        agreed: false
-      }
+        agreed: false,
+      },
     ])
   }, [user, electionId])
   const isVoted = useMemo(() => {
     if (user) {
-      return votes.some(vote => vote.userId === user.id)
+      return votes.some((vote) => vote.userId === user.id)
     }
     return false
   }, [votes, user])
@@ -83,20 +83,27 @@ const ElectionPage: NextPage<Props> = ({ id, roundId, electionId }) => {
       participants.length > 0 ? participants.length === votes.length : false,
     [participants, votes]
   )
-  const participantWithVotes = useMemo(() => {
-    if (isFullfilled) {
-      return participants.map(p => ({
+  const participantWithVotes = useMemo(
+    () =>
+      participants.map((p) => ({
         ...p,
-        isVoted: votes.some(vote => vote.userId === p.userId),
-        agreed: votes.find(vote => vote.userId === p.userId).agreed
+        isVoted: votes.some((vote) => vote.userId === p.userId),
+      })),
+    [participants, votes]
+  )
+  const participantWithResults = useMemo(() => {
+    if (isFullfilled) {
+      return participants.map((p) => ({
+        ...p,
+        agreed: votes.find((vote) => vote.userId === p.userId).agreed,
       }))
     }
     return []
-  }, [participants, votes, isFullfilled])
+  }, [participants, votes])
   const isHost = useIsHost(id)
   const isWin = useMemo(() => {
     if (isFullfilled && votes.length > 0 && participants.length > 0) {
-      const agrees = votes.filter(v => v.agreed)
+      const agrees = votes.filter((v) => v.agreed)
       return agrees.length > participants.length / 2
     }
     return false
@@ -124,8 +131,8 @@ const ElectionPage: NextPage<Props> = ({ id, roundId, electionId }) => {
     const { data } = await supabase.from('quests').insert([
       {
         party: election.party,
-        roundId
-      }
+        roundId,
+      },
     ])
     await supabase
       .from('rooms')
@@ -135,42 +142,85 @@ const ElectionPage: NextPage<Props> = ({ id, roundId, electionId }) => {
   }, [election, roundId])
   if (election && participants.length > 0) {
     return (
-      <div>
+      <div className="p-4">
         <Header></Header>
         <div>提案者:&nbsp;{election.by}</div>
         <div>
           パーティ:&nbsp;
-          {election.party.map(index => {
+          {election.party.map((index) => {
             const member = participants[index]
             return <span key={member.id}>{member.name},&nbsp;</span>
           })}
         </div>
-        {!isVoted && (
-          <div>
-            <button onClick={agree}>賛成</button>
-            <button onClick={disagree}>反対</button>
+        {!isVoted ? (
+          <div className="flex justify-around my-8">
+            <button
+              onClick={agree}
+              className="bg-green-500 text-3xl text-white rounded px-4 py-2"
+            >
+              賛成
+            </button>
+            <button
+              onClick={disagree}
+              className="text-3xl text-white rounded px-4 py-2 bg-red-500"
+            >
+              反対
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center my-8">
+            <span className="text-3xl text-white rounded px-4 py-2 bg-gray-400">
+              投票済
+            </span>
           </div>
         )}
-        {participantWithVotes.map(p => (
-          <div key={p.id}>
-            {p.name}&nbsp;-&nbsp;
-            {isFullfilled
-              ? p.agreed
-                ? '賛成'
-                : '反対'
-              : p.isVoted
-              ? '投票済'
-              : '未投票'}
-          </div>
-        ))}
+        {isFullfilled
+          ? participantWithResults.map((p) => (
+              <div key={p.id} className="my-2">
+                {p.agreed ? (
+                  <span className="rounded text-white p-1 bg-green-500">
+                    賛成
+                  </span>
+                ) : (
+                  <span className="rounded text-white p-1 bg-red-500">
+                    反対
+                  </span>
+                )}
+                &nbsp;-&nbsp;{p.name}
+              </div>
+            ))
+          : participantWithVotes.map((p) => (
+              <div key={p.id} className="my-2">
+                {p.isVoted ? (
+                  <span className="rounded text-white p-1 bg-yellow-300">
+                    投票済
+                  </span>
+                ) : (
+                  <span className="bg-gray-500 rounded text-white p-1">
+                    未投票
+                  </span>
+                )}
+                &nbsp;-&nbsp;{p.name}
+              </div>
+            ))}
         {isFullfilled && isHost && isWin && (
-          <div>
-            <button onClick={gotoQuest}>クエストへ</button>
+          <div className="flex flex-col items-center">
+            <button
+              onClick={gotoQuest}
+              className="text-3xl bg-green-500 text-white rounded px-4 py-2 mt-8"
+            >
+              クエストへ
+            </button>
           </div>
         )}
         {isFullfilled && isHost && !isWin && (
-          <div>
-            <button onClick={gotoNextElection}>次の投票へ</button>
+          <div className="flex flex-col items-center">
+            <button
+              onClick={gotoNextElection}
+              className="text-3xl bg-green-500 text-white rounded px-4 py-2 mt-8"
+            >
+              次の投票へ
+            </button>
           </div>
         )}
       </div>
