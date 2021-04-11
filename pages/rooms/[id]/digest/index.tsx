@@ -8,12 +8,12 @@ type Props = {
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query
+  query,
 }) => {
   return {
     props: {
-      id: query.id as string
-    }
+      id: query.id as string,
+    },
   }
 }
 
@@ -25,9 +25,8 @@ const DigestPage: NextPage<Props> = ({ id }) => {
       .select()
       .eq('roomId', id)
       .order('createdAt')
-      .then(res => setRounds([...res.data]))
+      .then((res) => setRounds([...res.data]))
   }, [])
-  console.log(rounds)
   return (
     <div>
       <div>ラウンドの履歴</div>

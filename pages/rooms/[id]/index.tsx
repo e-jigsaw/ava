@@ -55,7 +55,6 @@ const RoomPage: NextPage<Props> = ({ id }) => {
       .match({ id })
     router.push(`/rooms/${id}/rounds/${data[0].id}`)
   }, [id, participants])
-  console.log(participants)
   return (
     <div className="p-4">
       <Header></Header>
