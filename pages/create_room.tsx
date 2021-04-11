@@ -33,7 +33,7 @@ const CreateRoomPage = () => {
     <div className="flex flex-col items-center p-4">
       <button
         onClick={createRoom}
-        className="text-2xl border border-gray-500 rounded p-1"
+        className="text-2xl border rounded p-1 bg-green-500 text-white"
       >
         ルームを作成
       </button>
