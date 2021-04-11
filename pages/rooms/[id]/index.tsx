@@ -4,6 +4,7 @@ import { useMemo, useCallback } from 'react'
 import { supabase } from 'resources'
 import { useIsHost, useParticipants, useUser } from 'resources/hooks'
 import { Header } from 'components/Header'
+import { range, shuffle } from 'lodash'
 
 type Props = {
   id: string
@@ -44,6 +45,81 @@ const RoomPage: NextPage<Props> = ({ id }) => {
     return false
   }, [user, participants])
   const createRound = useCallback(async () => {
+    const isPercival = (document.getElementById('percival') as HTMLInputElement)
+      .checked
+    const isModred = (document.getElementById('modred') as HTMLInputElement)
+      .checked
+    switch (participants.length) {
+      case 5:
+      case 6: {
+        let [red0, red1, ...blues] = shuffle(range(participants.length))
+        await supabase
+          .from('participants')
+          .update({ role: 'killer' })
+          .match({ id: participants[red0].id })
+        if (isModred) {
+          await supabase
+            .from('participants')
+            .update({ role: 'modred' })
+            .match({ id: participants[red1].id })
+        } else {
+          await supabase
+            .from('participants')
+            .update({ role: 'red' })
+            .match({ id: participants[red1].id })
+        }
+        await supabase
+          .from('participants')
+          .update({ role: 'merlin' })
+          .match({ id: participants[blues[0]].id })
+        if (isPercival) {
+          await supabase
+            .from('participants')
+            .update({ role: 'percival' })
+            .match({ id: participants[blues[1]].id })
+        }
+        break
+      }
+      case 7:
+      case 8:
+      case 9: {
+        let [red0, red1, red2, ...blues] = shuffle(range(participants.length))
+        await supabase
+          .from('participants')
+          .update({ role: 'killer' })
+          .match({ id: participants[red0].id })
+        if (isModred) {
+          await supabase
+            .from('participants')
+            .update({ role: 'modred' })
+            .match({ id: participants[red1].id })
+        } else {
+          await supabase
+            .from('participants')
+            .update({ role: 'red' })
+            .match({ id: participants[red1].id })
+        }
+        await supabase
+          .from('participants')
+          .update({ role: 'red' })
+          .match({ id: participants[red2].id })
+        await supabase
+          .from('participants')
+          .update({ role: 'merlin' })
+          .match({ id: participants[blues[0]].id })
+        if (isPercival) {
+          await supabase
+            .from('participants')
+            .update({ role: 'percival' })
+            .match({ id: participants[blues[1]].id })
+        }
+        break
+      }
+      case 10: {
+        // TODO
+        break
+      }
+    }
     const { data } = await supabase.from('rounds').insert([
       {
         roomId: id,
@@ -78,6 +154,14 @@ const RoomPage: NextPage<Props> = ({ id }) => {
       )}
       {isHost && (
         <div className="flex flex-col items-center">
+          <div>
+            <input type="checkbox" id="percival"></input>
+            <label htmlFor="percival">パーシバルを有効化</label>
+          </div>
+          <div>
+            <input type="checkbox" id="modred"></input>
+            <label htmlFor="modred">モードレッドを有効化</label>
+          </div>
           <button
             onClick={createRound}
             className="text-3xl bg-green-500 text-white rounded px-4 py-2 mt-8"

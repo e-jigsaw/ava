@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useRoom } from 'resources/hooks'
 import Link from 'next/link'
 
@@ -21,6 +21,11 @@ export const Header = () => {
           </button>
         </Link>
       )}
+      <Link href={`/rooms/${router.query.id}/role`}>
+        <button className="absolute right-2 bottom-4 rounded bg-yellow-200 p-3">
+          役職
+        </button>
+      </Link>
     </div>
   )
 }
